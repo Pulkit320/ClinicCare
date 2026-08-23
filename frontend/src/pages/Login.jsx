@@ -36,7 +36,7 @@ const Login = () => {
         <div style={{ display: "flex", justifyContent: "center", alignItems: 'center', minHeight: '85vh' }}>
             <div className="glass-card" style={{ width: '100%', maxWidth: '420px' }}>
                 <div style={{ textAlign: 'center', marginBottom: '2rem' }}>
-                    <h2 style={({ color: 'var(--primary-blue)', fontSize: '1.6rem', marginBottom: '0.4rem' })}>Welcome Back</h2>
+                    <h2 style={{ color: 'var(--primary-blue)', fontSize: '1.6rem', marginBottom: '0.4rem' }}>Welcome Back</h2>
                     <p style={{ color: 'var(--secondary-text)', fontSize: '0.9rem' }}>Log into ClinicCare Platform</p>
                 </div>
                 {error && (
@@ -59,7 +59,7 @@ const Login = () => {
                 </form>
                 <div style={{ textAlign: 'center', marginTop: '1.5rem', fontSize: '0.85rem' }}>
                     <p style={{ color: 'var(--secondary-text)', marginBottom: '0.6rem' }}>Don't have an account?</p>
-                    <Link to="/register" style={({ color: 'var(--primary-blue)', fontWeight: '600', textDecoration: 'none' })}>
+                    <Link to="/register" style={{ color: 'var(--primary-blue)', fontWeight: '600', textDecoration: 'none' }}>
                         Create Account
                     </Link>
                 </div>

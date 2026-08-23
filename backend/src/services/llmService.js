@@ -8,12 +8,12 @@ export const generatePreVisitSummary = async (symptoms) => {
     const defaultFallback = {
         urgency: "MEDIUM",
         chiefComplaint: symptoms.substring(0, 100),
-        question: [
+        questions: [
             "What could be causing these symptoms?",
             "Are there any specific lifestyle changes recommended?",
-            "What signs should I moniter that would indicate worsening?"
+            "What signs should I monitor that would indicate worsening?"
         ],
-        rawText: `Symptoms recored : ${symptoms}`
+        rawText: `Symptoms recorded: ${symptoms}`
     };
 
     if (!ai) {

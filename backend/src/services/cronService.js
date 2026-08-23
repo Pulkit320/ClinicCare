@@ -1,6 +1,5 @@
 import cron from 'node-cron';
 import prisma from '../config/db.js';
-import { sendBookingConfirmationEmail } from './emailService.js';
 
 export const initCronJobs = () => {
     console.log("Background Medication Reminder Cron Jon Initialized.");

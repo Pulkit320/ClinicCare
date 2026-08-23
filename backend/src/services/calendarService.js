@@ -6,7 +6,8 @@ dotenv.config();
 export const createGoogleCalendarEvent = async ({ doctorName, patientName, patientEmail, date, startTime, endTime, symptoms }) => {
     try {
         if (!process.env.GOOGLE_CLIENT_ID || !process.env.GOOGLE_CLIENT_SECRET) {
-            console.log("Google Calendar credentails not configured. Skipping GCAL event creation.");
+            console.log("Google Calendar credentials not configured. Returning fallback event ID.");
+            return `mock_gcal_event-${Date.now()}`;
         }
         const oauth2Client = new google.auth.OAuth2(
             process.env.GOOGLE_CLIENT_ID,
