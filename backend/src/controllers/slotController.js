@@ -1,5 +1,7 @@
 import prisma from "../config/db.js";
 import { generateTimeSlots } from "../utils/slotGenerator.js";
+import { createGoogleCalendarEvent } from "../services/calendarService.js";
+import { sendBookingConfirmationEmail } from "../services/emailService.js";
 
 export const getAvailableSlots = async (req, res) => {
     try {
@@ -127,6 +129,46 @@ export const bookSlot = async (req, res) => {
             });
             return appointment;
         });
+
+        // Trigger Google Calendar Sync & Confirmation Email Async
+        try {
+            const doctorName = result.doctor?.user?.name || "Doctor";
+            const patientName = result.patient?.name || "Patient";
+            const patientEmail = result.patient?.email || req.user.email;
+
+            // 1. Google Calendar Event
+            const gcalEventId = await createGoogleCalendarEvent({
+                doctorName,
+                patientName,
+                patientEmail,
+                date: result.slot.date,
+                startTime: result.slot.startTime,
+                endTime: result.slot.endTime,
+                symptoms: result.symptoms
+            });
+
+            if (gcalEventId && !gcalEventId.startsWith('mock_')) {
+                await prisma.appointment.update({
+                    where: { id: result.id },
+                    data: { gcalEventId }
+                });
+            }
+
+            // 2. Email Notification
+            if (patientEmail) {
+                sendBookingConfirmationEmail({
+                    patientEmail,
+                    patientName,
+                    doctorName,
+                    date: result.slot.date,
+                    startTime: result.slot.startTime,
+                    endTime: result.slot.endTime
+                });
+            }
+        } catch (syncErr) {
+            console.error("GCal/Email Sync Warning:", syncErr);
+        }
+
         res.status(201).json({ message: "Appointment booked successfully", appointment: result });
     }
     catch (error) {
@@ -138,5 +180,28 @@ export const bookSlot = async (req, res) => {
         }
         console.error("Error Booking Appointment: ", error);
         return res.status(500).json({ message: "Error Booking" });
+    }
+};
+
+export const getPatientAppointments = async (req, res) => {
+    try {
+        const patientId = req.user.id;
+        const appointments = await prisma.appointment.findMany({
+            where: { patientId },
+            include: {
+                slot: true,
+                doctor: {
+                    include: {
+                        user: { select: { name: true, email: true } }
+                    }
+                },
+                llmSummaries: true
+            },
+            orderBy: { createdAt: 'desc' }
+        });
+        res.json(appointments);
+    } catch (error) {
+        console.error("Error fetching patient appointments:", error);
+        res.status(500).json({ message: error.message });
     }
 };
