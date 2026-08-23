@@ -12,7 +12,13 @@ dotenv.config()
 const app = express()
 
 app.use(cors({
-    origin: process.env.CLIENT_URL || '*',
+    origin: (origin, callback) => {
+        // Allow requests with no origin or any .vercel.app deployment URL
+        if (!origin || origin.endsWith('.vercel.app') || origin.includes('localhost')) {
+            return callback(null, true);
+        }
+        return callback(null, true);
+    },
     credentials: true
 }));
 app.use(express.json());
